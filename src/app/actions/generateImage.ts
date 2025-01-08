@@ -20,14 +20,7 @@ export async function generateImage(prompt: string): Promise<string | null> {
       size: '256x256',
     });
 
-    const url = response.data[0].url ?? null;
-
-    console.log(url);
-
-    // simulate a delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    return url;
+    return response.data[0].url ?? null;
   } catch (error) {
     console.error('Error generating image:', error);
     throw new Error('Failed to generate image');
