@@ -44,12 +44,13 @@ export default function ImageGenerator() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex space-x-2">
+          <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
             <Input
               name="prompt"
               value={prompt}
               placeholder="a cute cat sitting on a cloud"
               onChange={(e) => setPrompt(e.target.value)}
+              className="flex-grow"
             />
             <Button
               disabled={!prompt || generating}
@@ -59,7 +60,7 @@ export default function ImageGenerator() {
               {generating ? (
                 <>
                   <Loader2 className="size-5 animate-spin font-bold" />
-                  Generating...
+                  Generating
                 </>
               ) : (
                 <>
