@@ -12,25 +12,34 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { generateImage } from './actions/generateImage';
-import { WandSparklesIcon, Loader2 } from 'lucide-react';
+import { WandSparklesIcon, Loader2, AlertCircle } from 'lucide-react';
 
 export default function ImageGenerator() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [prompt, setPrompt] = useState<string>('');
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleClick = async () => {
     setGenerating(true);
+    setImageUrl(null);
+    setError(null);
     try {
       const url = await generateImage(prompt);
       setImageUrl(url);
-      setGeneratedPrompt(prompt);
+      setPrompt('');
+      setError(null);
     } catch (error) {
-      console.error('Error generating image:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'An unknown error occurred';
+      console.error('Error generating image:', errorMessage);
+      setError(errorMessage);
     } finally {
       setGenerating(false);
+      setGeneratedPrompt(prompt);
     }
   };
 
@@ -70,26 +79,31 @@ export default function ImageGenerator() {
               )}
             </Button>
           </div>
-          {generatedPrompt && !generating ? (
-            <>
-              <Separator className="my-4" />
-              <div className="space-y-4">
-                <div>
-                  {imageUrl && (
-                    <Image
-                      alt={generatedPrompt}
-                      src={imageUrl}
-                      width={256}
-                      height={256}
-                    />
-                  )}
-                </div>
-                <div className="text-sm font-medium">
-                  <p className="line-clamp-3 text-primary">{generatedPrompt}</p>
-                </div>
-              </div>
-            </>
-          ) : null}
+
+          {generatedPrompt && <Separator className="my-4" />}
+
+          <div className="space-y-4">
+            {error && (
+              <Alert variant="destructive" className="font-base">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle className="font-bold">Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            {imageUrl && (
+              <>
+                <Image
+                  alt={generatedPrompt}
+                  src={imageUrl}
+                  width={256}
+                  height={256}
+                />
+                <p className="text-sm font-medium line-clamp-3 text-primary">
+                  {generatedPrompt}
+                </p>
+              </>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
