@@ -22,11 +22,17 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import { WandSparklesIcon, Loader2, AlertCircle } from 'lucide-react';
+import {
+  WandSparklesIcon,
+  Loader2,
+  AlertCircle,
+  ImageDown,
+} from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { generateImage } from './actions/generateImage';
 import { generatorSchema, GeneratorValues } from '@/lib/validation';
+import { downloadImage, generateImageId } from '@/lib/utils';
 
 export default function ImageGenerator() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -129,6 +135,7 @@ export default function ImageGenerator() {
               <div className="flex flex-col space-y-4">
                 <Skeleton className="h-[256px] w-[256px] rounded-xl" />
                 <Skeleton className="h-4 w-[200px]" />
+                <Skeleton className="h-9 w-[120px]" />
               </div>
             )}
 
@@ -155,6 +162,15 @@ export default function ImageGenerator() {
                 <p className="text-sm font-medium line-clamp-3 text-primary">
                   {generatedPrompt}
                 </p>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    downloadImage(generateImageId(generatedPrompt), imageUrl)
+                  }
+                >
+                  <ImageDown className="size-4 inline-block" />
+                  Download
+                </Button>
               </>
             )}
           </div>
