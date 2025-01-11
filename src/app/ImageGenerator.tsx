@@ -9,28 +9,45 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { generateImage } from './actions/generateImage';
 import { WandSparklesIcon, Loader2, AlertCircle } from 'lucide-react';
+import { generateImage } from './actions/generateImage';
+import { generatorSchema, GeneratorValues } from '@/lib/validation';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 
 export default function ImageGenerator() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
-  const [prompt, setPrompt] = useState<string>('');
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
-  const handleClick = async () => {
+  const form = useForm<GeneratorValues>({
+    resolver: zodResolver(generatorSchema),
+    defaultValues: {
+      prompt: '',
+    },
+  });
+
+  const handleGenerateImage = async (values: GeneratorValues) => {
     setGenerating(true);
+    setGeneratedPrompt('');
     setImageUrl(null);
     setError(null);
     try {
-      const url = await generateImage(prompt);
+      const url = await generateImage(values.prompt);
       setImageUrl(url);
-      setPrompt('');
       setError(null);
     } catch (error) {
       const errorMessage =
@@ -38,8 +55,9 @@ export default function ImageGenerator() {
       console.error('Error generating image:', errorMessage);
       setError(errorMessage);
     } finally {
+      console.log(111);
       setGenerating(false);
-      setGeneratedPrompt(prompt);
+      setGeneratedPrompt(values.prompt);
     }
   };
 
@@ -53,7 +71,7 @@ export default function ImageGenerator() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
+          {/* <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
             <Input
               name="prompt"
               value={prompt}
@@ -64,7 +82,7 @@ export default function ImageGenerator() {
             <Button
               disabled={!prompt || generating}
               className="shrink-0"
-              onClick={handleClick}
+              onClick={handleGenerateImage}
             >
               {generating ? (
                 <>
@@ -78,7 +96,49 @@ export default function ImageGenerator() {
                 </>
               )}
             </Button>
-          </div>
+          </div> */}
+
+          <Form {...form}>
+            <form
+              className="flex flex-col space-y-2 gap-2 sm:flex-row sm:items-top sm:gap-0 sm:space-x-2 sm:space-y-0"
+              onSubmit={form.handleSubmit(handleGenerateImage)}
+            >
+              <FormField
+                control={form.control}
+                name="prompt"
+                render={({ field }) => (
+                  <FormItem className="flex-grow space-y-0">
+                    <FormLabel className="sr-only">Prompt</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="a cute cat sitting on a cloud"
+                        onChange={(e) => {
+                          field.onChange(e);
+                          setError(null);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button disabled={generating} className="shrink-0" type="submit">
+                {generating ? (
+                  <>
+                    <Loader2 className="size-5 animate-spin font-bold" />
+                    Generating
+                  </>
+                ) : (
+                  <>
+                    <WandSparklesIcon className="size-4" />
+                    Generate
+                  </>
+                )}
+              </Button>
+            </form>
+          </Form>
 
           {generatedPrompt && <Separator className="my-4" />}
 
