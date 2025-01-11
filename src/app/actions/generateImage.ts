@@ -20,9 +20,12 @@ export async function generateImage(prompt: string): Promise<string | null> {
       size: '256x256',
     });
 
-    return response.data[0].url ?? null;
+    const url = response.data[0].url ?? null;
+    return url;
   } catch (error) {
-    console.error('Error generating image:', error);
-    throw new Error('Failed to generate image');
+    const errorMessage =
+      error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error('Error generating image:', errorMessage);
+    throw new Error(errorMessage);
   }
 }
