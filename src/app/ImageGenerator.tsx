@@ -74,9 +74,6 @@ export default function ImageGenerator() {
             <>
               <Separator className="my-4" />
               <div className="space-y-4">
-                <div className="text-sm font-medium">
-                  <p className="line-clamp-3 text-primary">{generatedPrompt}</p>
-                </div>
                 <div>
                   {imageUrl && (
                     <Image
@@ -86,6 +83,9 @@ export default function ImageGenerator() {
                       height={256}
                     />
                   )}
+                </div>
+                <div className="text-sm font-medium">
+                  <p className="line-clamp-3 text-primary">{generatedPrompt}</p>
                 </div>
               </div>
             </>
