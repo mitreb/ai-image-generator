@@ -21,11 +21,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Skeleton } from '@/components/ui/skeleton';
 import { WandSparklesIcon, Loader2, AlertCircle } from 'lucide-react';
-import { generateImage } from './actions/generateImage';
-import { generatorSchema, GeneratorValues } from '@/lib/validation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { generateImage } from './actions/generateImage';
+import { generatorSchema, GeneratorValues } from '@/lib/validation';
 
 export default function ImageGenerator() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -55,7 +56,6 @@ export default function ImageGenerator() {
       console.error('Error generating image:', errorMessage);
       setError(errorMessage);
     } finally {
-      console.log(111);
       setGenerating(false);
       setGeneratedPrompt(values.prompt);
     }
@@ -71,33 +71,6 @@ export default function ImageGenerator() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
-            <Input
-              name="prompt"
-              value={prompt}
-              placeholder="a cute cat sitting on a cloud"
-              onChange={(e) => setPrompt(e.target.value)}
-              className="flex-grow"
-            />
-            <Button
-              disabled={!prompt || generating}
-              className="shrink-0"
-              onClick={handleGenerateImage}
-            >
-              {generating ? (
-                <>
-                  <Loader2 className="size-5 animate-spin font-bold" />
-                  Generating
-                </>
-              ) : (
-                <>
-                  <WandSparklesIcon className="size-4" />
-                  Generate
-                </>
-              )}
-            </Button>
-          </div> */}
-
           <Form {...form}>
             <form
               className="flex flex-col space-y-2 gap-2 sm:flex-row sm:items-top sm:gap-0 sm:space-x-2 sm:space-y-0"
@@ -140,15 +113,36 @@ export default function ImageGenerator() {
             </form>
           </Form>
 
-          {generatedPrompt && <Separator className="my-4" />}
+          <Separator className="my-4" />
 
           <div className="space-y-4">
+            {!(imageUrl || error || generating) && (
+              <>
+                <div className="bg-primary/20 h-[256px] w-[256px] rounded-xl" />
+                <p className="text-sm font-medium text-primary">
+                  A new image will appear here
+                </p>
+              </>
+            )}
+
+            {generating && (
+              <div className="flex flex-col space-y-4">
+                <Skeleton className="h-[256px] w-[256px] rounded-xl" />
+                <Skeleton className="h-4 w-[200px]" />
+              </div>
+            )}
+
             {error && (
-              <Alert variant="destructive" className="font-base">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle className="font-bold">Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
+              <>
+                <Alert variant="destructive" className="font-base">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle className="font-bold">Error</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+                <p className="text-sm font-medium text-primary">
+                  Try a different prompt
+                </p>
+              </>
             )}
             {imageUrl && (
               <>
