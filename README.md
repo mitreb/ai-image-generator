@@ -45,7 +45,7 @@
 3. Create a `.env` file in the root directory and add your OpenAI API key:
 
    ```bash
-   NEXT_PUBLIC_OPENAI_API_KEY=your-openai-api-key
+   OPENAI_API_KEY=your-openai-api-key
    ```
 
 4. Start the development server:
